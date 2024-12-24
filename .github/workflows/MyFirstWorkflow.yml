@@ -13,9 +13,45 @@ jobs:
       - name: Greet the user
         run: |
           echo "Hello world from ${{ vars.WHO_TO_GREET }} from ${{ github.actor }}"
-          echo "Current branch is '${{ github.ref}}'."
-          echo "My secret is ${{ secrets.MY_SECRET }}"
         shell: bash
       - name: Checkout
         uses: actions/checkout@v4.2.2
       - run: tree
+      
+  Test:
+    runs-on: ubuntu-latest
+    environment: Test
+    needs: first_job
+    steps:
+      - run: |
+          echo "Hello ${{ vars.WHO_TO_GREET }} from ${{ github.actor }}."
+          echo "Current branch is '${{ github.ref}}'."
+          echo "My secret is ${{ secrets.MY_SECRET }}"
+          sec=$(echo ${{ secrets.MY_SECRET }} | sed 's/./& /g')
+          echo "My secret is  '$sec'."
+  Load-Test:
+    runs-on: ubuntu-latest
+    environment: Load-Test
+    needs: first_job
+    steps:
+      - run: |
+          echo "Hello ${{ vars.WHO_TO_GREET }} from ${{ github.actor }}."
+          echo "Current branch is '${{ github.ref}}'."
+          echo "My secret is ${{ secrets.MY_SECRET }}"
+          sec=$(echo ${{ secrets.MY_SECRET }} | sed 's/./& /g')
+          echo "My secret is  '$sec'."
+  Production:
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+      url: https://google.com
+    needs: [Test, Load-Test]
+    steps:
+      - run: |
+          echo "Hello ${{ vars.WHO_TO_GREET }} from ${{ github.actor }}."
+          echo "Current branch is '${{ github.ref}}'."
+          echo "My secret is ${{ secrets.MY_SECRET }}"
+          sec=$(echo ${{ secrets.MY_SECRET }} | sed 's/./& /g')
+          echo "My secret is  '$sec'."
+ 
+        
